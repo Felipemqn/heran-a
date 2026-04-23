@@ -1,5 +1,5 @@
 // Schema Prisma do Jera Horizonte.
-// Entidades detalhadas serão criadas na Sessão 1.
+// Toda entidade com dados da familia tem familyId (RLS-ready).
 
 generator client {
   provider = "prisma-client-js"
@@ -11,3 +11,287 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ---------- Enums ----------
+
+enum GenerationTier {
+  founder
+  heir
+  grandheir
+}
+
+enum MemberRole {
+  founder
+  heir
+  observer
+  advisor
+}
+
+enum AssetClass {
+  fixed_income
+  equities
+  real_estate
+  alternatives
+  cash
+}
+
+enum AssetSubclass {
+  government_bonds
+  corporate_bonds
+  stocks_brazil
+  stocks_global
+  real_estate_funds
+  direct_real_estate
+  private_equity
+  hedge_funds
+  commodities
+  cash_brl
+  cash_usd
+}
+
+enum DecisionStatus {
+  pending_review
+  approved
+  rejected
+  archived
+}
+
+enum Liquidity {
+  immediate
+  short_term
+  medium_term
+  long_term
+  illiquid
+}
+
+enum ScenarioKind {
+  deterministic
+  monte_carlo
+}
+
+enum InvestmentHorizon {
+  short
+  medium
+  long
+  generational
+}
+
+enum RiskTolerance {
+  conservative
+  moderate
+  balanced
+  growth
+  aggressive
+}
+
+// ---------- Core ----------
+
+model Family {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  members          Member[]
+  assets           Asset[]
+  allocations      Allocation[]
+  historicalValues HistoricalValue[]
+  scenarios        Scenario[]
+  decisions        Decision[]
+  ipsVersions      IPSVersion[]
+  meetings         Meeting[]
+  auditLogs        AuditLog[]
+  aiInteractions   AiInteraction[]
+
+  @@map("family")
+}
+
+model Member {
+  id          String         @id @default(uuid())
+  familyId    String
+  name        String
+  role        MemberRole
+  generation  GenerationTier
+  birthDate   DateTime?
+  email       String?
+  clerkUserId String?        @unique
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+
+  family                Family     @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  decisionsResponsible  Decision[] @relation("DecisionResponsible")
+
+  @@index([familyId])
+  @@index([clerkUserId])
+  @@map("member")
+}
+
+model Asset {
+  id          String        @id @default(uuid())
+  familyId    String
+  name        String
+  class       AssetClass
+  subclass    AssetSubclass
+  liquidity   Liquidity
+  valueBrl    Decimal       @db.Decimal(18, 2)
+  currency    String        @default("BRL")
+  institution String?
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@index([familyId, class])
+  @@map("asset")
+}
+
+model Allocation {
+  id            String     @id @default(uuid())
+  familyId      String
+  class         AssetClass
+  percentage    Decimal    @db.Decimal(5, 2)
+  valueBrl      Decimal    @db.Decimal(18, 2)
+  snapshotDate  DateTime
+  createdAt     DateTime   @default(now())
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId, snapshotDate])
+  @@map("allocation")
+}
+
+model HistoricalValue {
+  id         String   @id @default(uuid())
+  familyId   String
+  valueBrl   Decimal  @db.Decimal(18, 2)
+  recordedAt DateTime
+  createdAt  DateTime @default(now())
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId, recordedAt])
+  @@map("historical_value")
+}
+
+// ---------- Scenarios ----------
+
+model Scenario {
+  id          String       @id @default(uuid())
+  familyId    String
+  name        String
+  kind        ScenarioKind
+  allocation  Json
+  initialBrl  Decimal      @db.Decimal(18, 2)
+  years       Int
+  sims        Int?
+  result      Json?
+  createdBy   String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@map("scenario")
+}
+
+// ---------- Governance ----------
+
+model Decision {
+  id            String         @id @default(uuid())
+  familyId      String
+  title         String
+  description   String
+  status        DecisionStatus @default(pending_review)
+  responsibleId String?
+  meetingId     String?
+  decidedAt     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  responsible Member?  @relation("DecisionResponsible", fields: [responsibleId], references: [id])
+  meeting     Meeting? @relation(fields: [meetingId], references: [id])
+
+  @@index([familyId, status])
+  @@map("decision")
+}
+
+model IPSVersion {
+  id              String            @id @default(uuid())
+  familyId        String
+  version         Int
+  horizon         InvestmentHorizon
+  riskTolerance   RiskTolerance
+  minLiquidityMonths Int
+  restrictions    String?
+  reviewCadence   String
+  targetAllocation Json
+  createdBy       String?
+  createdAt       DateTime          @default(now())
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, version])
+  @@index([familyId])
+  @@map("ips_version")
+}
+
+model Meeting {
+  id              String    @id @default(uuid())
+  familyId        String
+  title           String
+  heldAt          DateTime
+  firefliesId     String?   @unique
+  transcript      String?
+  summary         String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  family    Family     @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  decisions Decision[]
+
+  @@index([familyId, heldAt])
+  @@map("meeting")
+}
+
+// ---------- Audit & AI ----------
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  familyId   String?
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  family Family? @relation(fields: [familyId], references: [id], onDelete: SetNull)
+
+  @@index([familyId, createdAt])
+  @@index([action])
+  @@map("audit_log")
+}
+
+model AiInteraction {
+  id        String   @id @default(uuid())
+  familyId  String
+  actorId   String?
+  agent     String
+  prompt    String
+  response  String
+  tokensIn  Int?
+  tokensOut Int?
+  createdAt DateTime @default(now())
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId, createdAt])
+  @@map("ai_interaction")
+}

@@ -1,38 +1,100 @@
 # Jera Horizonte
 
-Plataforma de gestão patrimonial para multi-family office da Jera Capital.
+Plataforma de gestao patrimonial para multi-family office da Jera Capital.
 
-## Getting Started
+## Stack
 
-First, run the development server:
+- **Next.js 16** (App Router, Turbopack)
+- **TypeScript** strict
+- **TailwindCSS v4** com paleta Jera
+- **shadcn/ui** (primitives Radix + customizacao Jera)
+- **Prisma 7** + **Supabase** (PostgreSQL + RLS)
+- **Clerk** (autenticacao)
+- **Vitest** + **Playwright** (testes)
+
+## Setup local
 
 ```bash
+npm install
+cp .env.example .env.local  # preencher com credenciais reais
+npm run db:generate         # gera o Prisma Client (ver notas abaixo)
+npm run db:migrate          # aplica migrations
+npm run db:seed             # popula Familia Silva
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Credenciais obrigatorias no .env.local
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variavel | Onde obter |
+|---|---|
+| `DATABASE_URL` / `DIRECT_URL` | Supabase project settings |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk dashboard |
+| `CLERK_SECRET_KEY` | Clerk dashboard |
+| `CLERK_WEBHOOK_SECRET` | Clerk webhook endpoint |
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase API settings |
 
-## Learn More
+Sem essas variaveis o app sobe mas retorna 500 nas rotas (Clerk valida a publishable key no boot).
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Script | Acao |
+|---|---|
+| `npm run dev` | Next dev server (Turbopack) |
+| `npm run build` | Build producao |
+| `npm run type-check` | `tsc --noEmit` |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest unit |
+| `npm run e2e` | Playwright |
+| `npm run db:generate` | Prisma Client generate |
+| `npm run db:migrate` | Prisma migrations |
+| `npm run db:seed` | Seed da Familia Silva |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estrutura
 
-## Deploy on Vercel
+```
+src/
+  app/                  Next.js App Router
+    (app)/              rotas autenticadas (dashboard, etc.)
+    (auth)/             sign-in, sign-up
+    api/webhooks/clerk  sync de usuarios
+    styleguide/         paleta + primitives demo
+  components/
+    ui/                 primitives Jera (Button, Card, Stat, Panel, Badge)
+    charts/             Recharts wrappers (Sparkline)
+    modules/            componentes de feature (AllocationBars, etc.)
+  lib/                  helpers (format, db, current-member, utils)
+  server/
+    queries/            consultas Prisma tipadas
+    integrations/       HubSpot, Fireflies, Sentry
+  types/                tipos de dominio
+prisma/
+  schema.prisma         modelo completo
+  seed.ts               Familia Silva
+  rls.sql               RLS policies para Supabase
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notas operacionais
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### OneDrive e `prisma generate`
+
+Se o repo esta dentro do OneDrive, `prisma generate` pode falhar com `EPERM`
+no `schema-engine` binario. Causa: OneDrive mantem arquivos `.exe` como
+placeholder "cloud-only". Solucoes:
+
+1. Excluir `node_modules/` da sincronizacao OneDrive (recomendado)
+2. Mover o projeto para fora do OneDrive
+3. Rodar `attrib +P -U` no diretorio de cache com permissao de admin
+
+Enquanto `prisma generate` nao roda, `src/lib/db.ts` e `prisma/seed.ts` usam
+um fallback com tipos `any` para manter o `type-check` limpo. Depois do
+generate, os tipos reais assumem automaticamente.
+
+### Next 16: middleware vs proxy
+
+Next 16 deprecou a convencao `middleware.ts`. O arquivo esta em `src/proxy.ts`.
+
+## Convencoes
+
+Ver `CLAUDE.md` para regras de codigo, commits e paleta.

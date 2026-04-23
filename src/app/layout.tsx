@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Fraunces, Instrument_Sans } from 'next/font/google'
+import { ClerkProvider } from '@clerk/nextjs'
+import { ptBR } from '@clerk/localizations'
 import './globals.css'
 
 const fraunces = Fraunces({
@@ -25,13 +27,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="pt-BR"
-      className={`${fraunces.variable} ${instrumentSans.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-jera-black text-jera-off">
-        {children}
-      </body>
-    </html>
+    <ClerkProvider localization={ptBR}>
+      <html
+        lang="pt-BR"
+        className={`${fraunces.variable} ${instrumentSans.variable} h-full antialiased`}
+      >
+        <body className="min-h-full flex flex-col bg-jera-black text-jera-off">
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

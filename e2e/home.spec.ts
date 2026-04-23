@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test('home page loads', async ({ page }) => {
+test('home renders hero', async ({ page }) => {
   await page.goto('/')
-  await expect(page).toHaveTitle(/Horizonte/)
+  await expect(page.getByRole('heading', { name: /Jera Horizonte/i })).toBeVisible()
 })
