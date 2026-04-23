@@ -29,6 +29,11 @@ async function DashboardContent() {
     x: h.recordedAt.getFullYear(),
     y: h.valueBrl,
   }))
+  const hasHistory = sparkData.length > 0
+  const firstYear = hasHistory ? overview.historical[0].recordedAt.getFullYear() : null
+  const lastYear = hasHistory
+    ? overview.historical[overview.historical.length - 1].recordedAt.getFullYear()
+    : null
 
   return (
     <div className="flex flex-col gap-10">
@@ -48,11 +53,18 @@ async function DashboardContent() {
           </span>
         </div>
         <Card className="md:w-[360px]" padding="sm">
-          <Sparkline data={sparkData} />
-          <div className="text-xs text-jera-off/50 px-3 pb-1">
-            {overview.historical[0].recordedAt.getFullYear()} &mdash;{' '}
-            {overview.historical[overview.historical.length - 1].recordedAt.getFullYear()}
-          </div>
+          {hasHistory ? (
+            <>
+              <Sparkline data={sparkData} />
+              <div className="text-xs text-jera-off/50 px-3 pb-1">
+                {firstYear} &mdash; {lastYear}
+              </div>
+            </>
+          ) : (
+            <div className="h-[60px] flex items-center justify-center text-xs text-jera-off/40">
+              Sem histórico disponível
+            </div>
+          )}
         </Card>
       </section>
 

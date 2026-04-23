@@ -18,48 +18,22 @@ async function main() {
     },
   })
 
-  await prisma.member.createMany({
-    skipDuplicates: true,
-    data: [
-      {
-        familyId: family.id,
-        name: 'Roberto Silva',
-        role: 'founder',
-        generation: 'founder',
-        birthDate: new Date('1955-03-12'),
-        email: 'roberto@familiasilva.example',
-      },
-      {
-        familyId: family.id,
-        name: 'Marina Silva',
-        role: 'founder',
-        generation: 'founder',
-        birthDate: new Date('1958-08-04'),
-        email: 'marina@familiasilva.example',
-      },
-      {
-        familyId: family.id,
-        name: 'Pedro Silva',
-        role: 'heir',
-        generation: 'heir',
-        birthDate: new Date('1985-01-22'),
-      },
-      {
-        familyId: family.id,
-        name: 'Ana Silva',
-        role: 'heir',
-        generation: 'heir',
-        birthDate: new Date('1988-06-17'),
-      },
-      {
-        familyId: family.id,
-        name: 'Lucas Silva',
-        role: 'observer',
-        generation: 'grandheir',
-        birthDate: new Date('2015-11-02'),
-      },
-    ],
-  })
+  // Members idempotentes: identificados por (familyId, name).
+  const members = [
+    { name: 'Roberto Silva', role: 'founder', generation: 'founder', birthDate: new Date('1955-03-12'), email: 'roberto@familiasilva.example' },
+    { name: 'Marina Silva', role: 'founder', generation: 'founder', birthDate: new Date('1958-08-04'), email: 'marina@familiasilva.example' },
+    { name: 'Pedro Silva', role: 'heir', generation: 'heir', birthDate: new Date('1985-01-22'), email: null },
+    { name: 'Ana Silva', role: 'heir', generation: 'heir', birthDate: new Date('1988-06-17'), email: null },
+    { name: 'Lucas Silva', role: 'observer', generation: 'grandheir', birthDate: new Date('2015-11-02'), email: null },
+  ]
+  for (const m of members) {
+    const existing = await prisma.member.findFirst({
+      where: { familyId: family.id, name: m.name },
+    })
+    if (!existing) {
+      await prisma.member.create({ data: { ...m, familyId: family.id } })
+    }
+  }
 
   const allocations: Array<{ class: 'fixed_income' | 'equities' | 'real_estate' | 'alternatives' | 'cash'; pct: number; value: number }> = [
     { class: 'fixed_income', pct: 42, value: 42_000_000 },
@@ -69,7 +43,12 @@ async function main() {
     { class: 'cash', pct: 2, value: 2_000_000 },
   ]
 
+  // Snapshot do dia: remove allocations de hoje antes de inserir.
   const today = new Date()
+  const startOfDay = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()))
+  await prisma.allocation.deleteMany({
+    where: { familyId: family.id, snapshotDate: { gte: startOfDay } },
+  })
   for (const a of allocations) {
     await prisma.allocation.create({
       data: {
@@ -77,13 +56,14 @@ async function main() {
         class: a.class,
         percentage: a.pct,
         valueBrl: a.value,
-        snapshotDate: today,
+        snapshotDate: startOfDay,
       },
     })
   }
 
+  // Assets idempotentes: limpa e recria (seed fixture, nao user data).
+  await prisma.asset.deleteMany({ where: { familyId: family.id } })
   await prisma.asset.createMany({
-    skipDuplicates: true,
     data: [
       { familyId: family.id, name: 'Tesouro IPCA+ 2035', class: 'fixed_income', subclass: 'government_bonds', liquidity: 'medium_term', valueBrl: 22_000_000, institution: 'Tesouro Direto' },
       { familyId: family.id, name: 'Carteira CDBs high-grade', class: 'fixed_income', subclass: 'corporate_bonds', liquidity: 'short_term', valueBrl: 20_000_000 },
@@ -96,7 +76,9 @@ async function main() {
     ],
   })
 
-  const baseYear = new Date().getFullYear() - 5
+  // Historico idempotente: limpa antes de recriar.
+  await prisma.historicalValue.deleteMany({ where: { familyId: family.id } })
+  const baseYear = new Date().getUTCFullYear() - 5
   for (let i = 0; i < 6; i++) {
     const year = baseYear + i
     const growth = 80_000_000 * Math.pow(1.05, i)
@@ -104,13 +86,16 @@ async function main() {
       data: {
         familyId: family.id,
         valueBrl: Math.round(growth),
-        recordedAt: new Date(year, 11, 31),
+        recordedAt: new Date(Date.UTC(year, 11, 31)),
       },
     })
   }
 
-  await prisma.iPSVersion.create({
-    data: {
+  // IPS v1 via upsert no par unico (familyId, version).
+  await prisma.ipsVersion.upsert({
+    where: { familyId_version: { familyId: family.id, version: 1 } },
+    update: {},
+    create: {
       familyId: family.id,
       version: 1,
       horizon: 'generational',

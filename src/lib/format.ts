@@ -1,10 +1,14 @@
+function ptNumber(value: number, digits: number): string {
+  return value.toFixed(digits).replace('.', ',')
+}
+
 export function fmtMoney(valueBrl: number, opts: { compact?: boolean } = {}): string {
   const { compact = false } = opts
   if (compact) {
     const abs = Math.abs(valueBrl)
-    if (abs >= 1_000_000_000) return `R$ ${(valueBrl / 1_000_000_000).toFixed(1)}B`
-    if (abs >= 1_000_000) return `R$ ${(valueBrl / 1_000_000).toFixed(1)}M`
-    if (abs >= 1_000) return `R$ ${(valueBrl / 1_000).toFixed(1)}k`
+    if (abs >= 1_000_000_000) return `R$ ${ptNumber(valueBrl / 1_000_000_000, 1)}B`
+    if (abs >= 1_000_000) return `R$ ${ptNumber(valueBrl / 1_000_000, 1)}M`
+    if (abs >= 1_000) return `R$ ${ptNumber(valueBrl / 1_000, 1)}k`
     return `R$ ${valueBrl.toFixed(0)}`
   }
   return new Intl.NumberFormat('pt-BR', {

@@ -41,18 +41,35 @@ export async function POST(req: Request) {
     const lastName = (event.data.last_name as string | null) ?? ''
     const name = `${firstName} ${lastName}`.trim() || (email ?? 'Novo membro')
 
-    await db.member.upsert({
+    const existing = await db.member.findUnique({ where: { clerkUserId: userId } })
+
+    if (existing) {
+      await db.member.update({
+        where: { clerkUserId: userId },
+        data: { email, name },
+      })
+    } else {
+      // Novo membro: dev auto-assigna a "Familia Teste".
+      // Em producao, um advisor convida o membro antes da criacao do clerk user.
+      const familyId = await resolveDefaultFamilyId()
+      await db.member.create({
+        data: {
+          clerkUserId: userId,
+          email,
+          name,
+          familyId,
+          role: 'observer',
+          generation: 'heir',
+        },
+      })
+    }
+  }
+
+  if (event.type === 'user.deleted') {
+    const userId = event.data.id as string
+    await db.member.updateMany({
       where: { clerkUserId: userId },
-      update: { email, name },
-      create: {
-        clerkUserId: userId,
-        email,
-        name,
-        // Default: primeiro acesso entra como observer na familia de teste
-        familyId: await resolveDefaultFamilyId(),
-        role: 'observer',
-        generation: 'heir',
-      },
+      data: { deletedAt: new Date(), clerkUserId: null },
     })
   }
 
@@ -60,6 +77,12 @@ export async function POST(req: Request) {
 }
 
 async function resolveDefaultFamilyId(): Promise<string> {
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_AUTO_FAMILY) {
+    throw new Error(
+      'Auto-atribuicao a Familia Teste esta bloqueada em producao. Definir ALLOW_AUTO_FAMILY=1 ou invocar fluxo de convite.'
+    )
+  }
+
   const family = await db.family.findFirst({
     where: { slug: 'familia-teste' },
     select: { id: true },

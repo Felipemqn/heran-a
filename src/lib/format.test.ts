@@ -5,11 +5,17 @@ describe('fmtMoney', () => {
   it('formats BRL', () => {
     expect(fmtMoney(100_000_000)).toMatch(/R\$\s?100\.000\.000/)
   })
-  it('compacts millions', () => {
-    expect(fmtMoney(42_500_000, { compact: true })).toBe('R$ 42.5M')
+  it('compacts millions with pt-BR decimal', () => {
+    expect(fmtMoney(42_500_000, { compact: true })).toBe('R$ 42,5M')
   })
-  it('compacts billions', () => {
-    expect(fmtMoney(1_200_000_000, { compact: true })).toBe('R$ 1.2B')
+  it('compacts billions with pt-BR decimal', () => {
+    expect(fmtMoney(1_200_000_000, { compact: true })).toBe('R$ 1,2B')
+  })
+  it('compacts thousands', () => {
+    expect(fmtMoney(5_400, { compact: true })).toBe('R$ 5,4k')
+  })
+  it('handles negatives in compact', () => {
+    expect(fmtMoney(-2_500_000, { compact: true })).toBe('R$ -2,5M')
   })
 })
 

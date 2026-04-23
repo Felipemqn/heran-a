@@ -99,7 +99,7 @@ model Family {
   historicalValues HistoricalValue[]
   scenarios        Scenario[]
   decisions        Decision[]
-  ipsVersions      IPSVersion[]
+  ipsVersions      IpsVersion[]
   meetings         Meeting[]
   auditLogs        AuditLog[]
   aiInteractions   AiInteraction[]
@@ -206,7 +206,7 @@ model Decision {
   id            String         @id @default(uuid())
   familyId      String
   title         String
-  description   String
+  description   String         @db.Text
   status        DecisionStatus @default(pending_review)
   responsibleId String?
   meetingId     String?
@@ -222,7 +222,7 @@ model Decision {
   @@map("decision")
 }
 
-model IPSVersion {
+model IpsVersion {
   id              String            @id @default(uuid())
   familyId        String
   version         Int
@@ -248,8 +248,8 @@ model Meeting {
   title           String
   heldAt          DateTime
   firefliesId     String?   @unique
-  transcript      String?
-  summary         String?
+  transcript      String?   @db.Text
+  summary         String?   @db.Text
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -284,8 +284,8 @@ model AiInteraction {
   familyId  String
   actorId   String?
   agent     String
-  prompt    String
-  response  String
+  prompt    String   @db.Text
+  response  String   @db.Text
   tokensIn  Int?
   tokensOut Int?
   createdAt DateTime @default(now())

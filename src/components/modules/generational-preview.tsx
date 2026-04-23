@@ -29,7 +29,7 @@ export default function GenerationalPreview({ members }: Props) {
               </div>
             ))}
             {group.list.length === 0 && (
-              <div className="text-sm text-jera-off/40">\u2014</div>
+              <div className="text-sm text-jera-off/40">—</div>
             )}
           </div>
         </div>

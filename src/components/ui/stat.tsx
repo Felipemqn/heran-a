@@ -20,7 +20,7 @@ export function Stat({ label, value, delta, deltaTone = 'neutral', hint, classNa
       {(delta || hint) && (
         <span className={cn('text-xs', deltaColor)}>
           {delta}
-          {delta && hint ? ' \u00B7 ' : ''}
+          {delta && hint ? ' · ' : ''}
           {hint && <span className="text-jera-off/50">{hint}</span>}
         </span>
       )}
