@@ -1,22 +1,18 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db'
+import { getCurrentMember } from '@/lib/current-member'
 import { listFamilyClients, syncClientToFamily } from '@/server/integrations/hubspot'
 
 export async function POST() {
-  const { userId } = await auth()
-  if (!userId) {
+  const member = await getCurrentMember()
+  if (!member) {
     return NextResponse.json({ error: 'nao autenticado' }, { status: 401 })
   }
 
-  // Apenas advisors podem disparar sync.
-  const member = await db.member.findUnique({
-    where: { clerkUserId: userId },
-    select: { role: true },
-  })
-  if (member?.role !== 'advisor') {
+  if (member.role !== 'advisor') {
     return NextResponse.json({ error: 'acesso restrito a advisors' }, { status: 403 })
   }
+
+  const userId = member.clerkUserId
 
   try {
     const contacts = await listFamilyClients()

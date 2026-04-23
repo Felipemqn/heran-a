@@ -1,20 +1,16 @@
 import { redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { Card } from '@/components/ui/card'
 import { Panel } from '@/components/ui/panel'
 import { Badge } from '@/components/ui/badge'
+import { getCurrentMember } from '@/lib/current-member'
 import SyncHubspotButton from './sync-button'
 
 export default async function AdminFamiliesPage() {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  const me = await getCurrentMember()
+  if (!me) redirect('/sign-in')
 
-  const me = await db.member.findUnique({
-    where: { clerkUserId: userId },
-    select: { role: true },
-  })
-  if (me?.role !== 'advisor') {
+  if (me.role !== 'advisor') {
     return (
       <main className="py-16">
         <Card>

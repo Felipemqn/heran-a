@@ -5,8 +5,9 @@
 -- Todas as referencias a colunas usam quoted identifiers preservando camelCase.
 
 -- Helper: extrai family_id do JWT (claim em snake_case por convencao Clerk/Supabase)
-create or replace function public.current_family_id() returns uuid as $$
-  select nullif(current_setting('request.jwt.claims', true)::json->>'family_id', '')::uuid
+-- Retorna text porque Prisma gera IDs como text (sem @db.Uuid).
+create or replace function public.current_family_id() returns text as $$
+  select nullif(current_setting('request.jwt.claims', true)::json->>'family_id', '')
 $$ language sql stable;
 
 -- Helper: extrai role do JWT

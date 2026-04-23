@@ -1,5 +1,6 @@
 import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
+import { AUTH_DISABLED } from '@/lib/auth-mode'
 
 interface Props {
   familyName: string
@@ -24,7 +25,13 @@ export default function ProtectedShell({ familyName, children }: Props) {
           </div>
           <div className="flex items-center gap-4">
             <span className="hidden sm:inline text-sm text-jera-off/60">{familyName}</span>
-            <UserButton />
+            {AUTH_DISABLED ? (
+              <span className="size-8 rounded-full bg-jera-teal/30 text-jera-mint text-xs flex items-center justify-center border border-jera-mint/40">
+                DEV
+              </span>
+            ) : (
+              <UserButton />
+            )}
           </div>
         </div>
       </header>

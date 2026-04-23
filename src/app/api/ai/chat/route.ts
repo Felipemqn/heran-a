@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db'
+import { getCurrentMember } from '@/lib/current-member'
 import { handleChat } from '@/server/ai/orchestrator'
 
 export const runtime = 'nodejs'
@@ -12,18 +11,11 @@ const BodySchema = z.object({
 })
 
 export async function POST(req: Request) {
-  const { userId } = await auth()
-  if (!userId) {
-    return NextResponse.json({ error: 'nao autenticado' }, { status: 401 })
-  }
-
-  const member = await db.member.findUnique({
-    where: { clerkUserId: userId },
-    include: { family: true },
-  })
+  const member = await getCurrentMember()
   if (!member) {
     return NextResponse.json({ error: 'membro nao encontrado' }, { status: 403 })
   }
+  const userId = member.clerkUserId
 
   let body: unknown
   try {

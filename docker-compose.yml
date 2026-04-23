@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: horizonte-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: horizonte
+      POSTGRES_PASSWORD: horizonte_dev
+      POSTGRES_DB: horizonte
+    volumes:
+      - horizonte-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U horizonte -d horizonte"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  horizonte-db-data:
