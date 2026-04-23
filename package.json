@@ -20,6 +20,7 @@
   "dependencies": {
     "@clerk/localizations": "^4.5.3",
     "@clerk/nextjs": "^7.2.5",
+    "@hubspot/api-client": "^13.5.0",
     "@prisma/client": "^6.19.3",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
