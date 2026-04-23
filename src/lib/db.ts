@@ -1,20 +1,11 @@
-// Singleton do Prisma Client. Requer `npm run db:generate` (prisma generate).
-// Enquanto o generate nao roda (ex: OneDrive bloqueando o binario schema-engine),
-// os tipos ficam como `any`. Depois de gerar, tipos reais assumem automaticamente.
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const prismaModule = require('@prisma/client') as {
-  PrismaClient: new () => unknown
-}
-
-type PrismaClientLike = Record<string, any>
+import { PrismaClient } from '@prisma/client'
 
 declare global {
-  var prismaGlobal: PrismaClientLike | undefined
+  // eslint-disable-next-line no-var
+  var prismaGlobal: PrismaClient | undefined
 }
 
-export const db: PrismaClientLike =
-  globalThis.prismaGlobal ?? (new prismaModule.PrismaClient() as PrismaClientLike)
+export const db = globalThis.prismaGlobal ?? new PrismaClient()
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.prismaGlobal = db
