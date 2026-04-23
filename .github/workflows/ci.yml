@@ -2,13 +2,19 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+      DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+      CLERK_SECRET_KEY: sk_test_placeholder
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,11 +26,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prisma generate
+        run: npx prisma generate
+
       - name: Type check
         run: npm run type-check
 
       - name: Lint
         run: npm run lint
 
-      - name: Tests
+      - name: Unit tests
         run: npm test
+
+      - name: Build
+        run: npm run build
