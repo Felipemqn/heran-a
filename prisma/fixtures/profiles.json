@@ -1,0 +1,194 @@
+[
+  {
+    "id": "brasil_suavizado",
+    "region": "brasil",
+    "level": "suavizado",
+    "weights": {
+      "br_cash_fi": 0.874,
+      "br_equities": 0.020000000000000004,
+      "br_alts": 0.09699999999999999,
+      "br_re": 0.009,
+      "int_cash_fi": 0.0,
+      "int_equities": 0.0,
+      "int_alts": 0.0,
+      "int_re": 0.0
+    },
+    "total": 1.0
+  },
+  {
+    "id": "brasil_conservador",
+    "region": "brasil",
+    "level": "conservador",
+    "weights": {
+      "br_cash_fi": 0.65,
+      "br_equities": 0.1,
+      "br_alts": 0.22499999999999998,
+      "br_re": 0.025,
+      "int_cash_fi": 0.0,
+      "int_equities": 0.0,
+      "int_alts": 0.0,
+      "int_re": 0.0
+    },
+    "total": 1.0
+  },
+  {
+    "id": "brasil_moderado",
+    "region": "brasil",
+    "level": "moderado",
+    "weights": {
+      "br_cash_fi": 0.525,
+      "br_equities": 0.15,
+      "br_alts": 0.275,
+      "br_re": 0.05,
+      "int_cash_fi": 0.0,
+      "int_equities": 0.0,
+      "int_alts": 0.0,
+      "int_re": 0.0
+    },
+    "total": 1.0
+  },
+  {
+    "id": "brasil_agressivo",
+    "region": "brasil",
+    "level": "agressivo",
+    "weights": {
+      "br_cash_fi": 0.395,
+      "br_equities": 0.225,
+      "br_alts": 0.31,
+      "br_re": 0.06999999999999999,
+      "int_cash_fi": 0.0,
+      "int_equities": 0.0,
+      "int_alts": 0.0,
+      "int_re": 0.0
+    },
+    "total": 1.0
+  },
+  {
+    "id": "internacional_suavizado",
+    "region": "internacional",
+    "level": "suavizado",
+    "weights": {
+      "br_cash_fi": 0.0,
+      "br_equities": 0.0,
+      "br_alts": 0.0,
+      "br_re": 0.0,
+      "int_cash_fi": 0.85025,
+      "int_equities": 0.053750000000000006,
+      "int_alts": 0.08000000000000002,
+      "int_re": 0.016000000000000004
+    },
+    "total": 1.0
+  },
+  {
+    "id": "internacional_conservador",
+    "region": "internacional",
+    "level": "conservador",
+    "weights": {
+      "br_cash_fi": 0.0,
+      "br_equities": 0.0,
+      "br_alts": 0.0,
+      "br_re": 0.0,
+      "int_cash_fi": 0.5525,
+      "int_equities": 0.1625,
+      "int_alts": 0.23750000000000002,
+      "int_re": 0.0475
+    },
+    "total": 1.0
+  },
+  {
+    "id": "internacional_moderado",
+    "region": "internacional",
+    "level": "moderado",
+    "weights": {
+      "br_cash_fi": 0.0,
+      "br_equities": 0.0,
+      "br_alts": 0.0,
+      "br_re": 0.0,
+      "int_cash_fi": 0.38999999999999996,
+      "int_equities": 0.175,
+      "int_alts": 0.3625,
+      "int_re": 0.0725
+    },
+    "total": 1.0
+  },
+  {
+    "id": "internacional_agressivo",
+    "region": "internacional",
+    "level": "agressivo",
+    "weights": {
+      "br_cash_fi": 0.0,
+      "br_equities": 0.0,
+      "br_alts": 0.0,
+      "br_re": 0.0,
+      "int_cash_fi": 0.23375,
+      "int_equities": 0.25625,
+      "int_alts": 0.425,
+      "int_re": 0.085
+    },
+    "total": 1.0
+  },
+  {
+    "id": "br_intl_suavizado",
+    "region": "br & intl",
+    "level": "suavizado",
+    "weights": {
+      "br_cash_fi": 0.8371428571428571,
+      "br_equities": 0.04285714285714285,
+      "br_alts": 0.06857142857142856,
+      "br_re": 0.00857142857142857,
+      "int_cash_fi": 0.004285714285714285,
+      "int_equities": 0.0,
+      "int_alts": 0.03214285714285714,
+      "int_re": 0.006428571428571428
+    },
+    "total": 1.0
+  },
+  {
+    "id": "br_intl_conservador",
+    "region": "br & intl",
+    "level": "conservador",
+    "weights": {
+      "br_cash_fi": 0.62,
+      "br_equities": 0.1,
+      "br_alts": 0.16,
+      "br_re": 0.020000000000000004,
+      "int_cash_fi": 0.010000000000000002,
+      "int_equities": 0.0,
+      "int_alts": 0.07500000000000001,
+      "int_re": 0.015
+    },
+    "total": 1.0
+  },
+  {
+    "id": "br_intl_moderado",
+    "region": "br & intl",
+    "level": "moderado",
+    "weights": {
+      "br_cash_fi": 0.35,
+      "br_equities": 0.15,
+      "br_alts": 0.175,
+      "br_re": 0.025,
+      "int_cash_fi": 0.06500000000000002,
+      "int_equities": 0.025,
+      "int_alts": 0.17500000000000002,
+      "int_re": 0.035
+    },
+    "total": 1.0
+  },
+  {
+    "id": "br_intl_agressivo",
+    "region": "br & intl",
+    "level": "agressivo",
+    "weights": {
+      "br_cash_fi": 0.22999999999999998,
+      "br_equities": 0.225,
+      "br_alts": 0.16499999999999998,
+      "br_re": 0.03,
+      "int_cash_fi": 0.06125,
+      "int_equities": 0.01875,
+      "int_alts": 0.225,
+      "int_re": 0.045
+    },
+    "total": 1.0
+  }
+]

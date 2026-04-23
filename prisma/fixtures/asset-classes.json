@@ -1,0 +1,83 @@
+[
+  {
+    "id": "br_cash_fi",
+    "label": "BR Cash + Renda Fixa",
+    "region": "brasil",
+    "category": "cash_fi",
+    "constituents": [
+      "RF BR CDI",
+      "RF BR Credito Pos-Fixado",
+      "RF BR Pre-Fixado",
+      "RF BR Inflacao"
+    ]
+  },
+  {
+    "id": "br_equities",
+    "label": "BR Renda Variavel",
+    "region": "brasil",
+    "category": "equities",
+    "constituents": [
+      "Renda Variavel BR"
+    ]
+  },
+  {
+    "id": "br_alts",
+    "label": "BR Alternativos",
+    "region": "brasil",
+    "category": "alternatives",
+    "constituents": [
+      "Retorno Absoluto BR",
+      "Private Equity BR"
+    ]
+  },
+  {
+    "id": "br_re",
+    "label": "BR Real Estate",
+    "region": "brasil",
+    "category": "real_estate",
+    "constituents": [
+      "Real Estate BR"
+    ]
+  },
+  {
+    "id": "int_cash_fi",
+    "label": "INT Cash + Renda Fixa",
+    "region": "internacional",
+    "category": "cash_fi",
+    "constituents": [
+      "Cash Equivalent",
+      "RF Intl. Pre-Fixado",
+      "RF Intl. Inflacao",
+      "RF Intl. Credito"
+    ]
+  },
+  {
+    "id": "int_equities",
+    "label": "INT Renda Variavel",
+    "region": "internacional",
+    "category": "equities",
+    "constituents": [
+      "Renda Variavel Intl."
+    ]
+  },
+  {
+    "id": "int_alts",
+    "label": "INT Alternativos",
+    "region": "internacional",
+    "category": "alternatives",
+    "constituents": [
+      "Retorno Absoluto Intl.",
+      "Private Equity Intl.",
+      "Commodities"
+    ]
+  },
+  {
+    "id": "int_re",
+    "label": "INT Real Estate",
+    "region": "internacional",
+    "category": "real_estate",
+    "constituents": [
+      "Real Estate Intl."
+    ]
+  }
+]
