@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import Sparkline from '@/components/charts/sparkline'
 import AllocationBars from '@/components/modules/allocation-bars'
 import GenerationalPreview from '@/components/modules/generational-preview'
+import ChatInput from '@/components/modules/chat-input'
 import { fmtMoney, fmtDelta } from '@/lib/format'
 import { getMockOverview, type FamilyOverview } from '@/server/queries/family-overview'
 
@@ -115,6 +116,10 @@ async function DashboardContent() {
         >
           <GenerationalPreview members={overview.members} />
         </Panel>
+      </section>
+
+      <section>
+        <ChatInput />
       </section>
     </div>
   )

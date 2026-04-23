@@ -18,6 +18,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
     "@clerk/localizations": "^4.5.3",
     "@clerk/nextjs": "^7.2.5",
     "@hubspot/api-client": "^13.5.0",
