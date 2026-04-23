@@ -44,10 +44,11 @@ export interface HistoricalPoint {
   returns: Record<BucketId, number>
 }
 
-export const assetClasses: AssetClass[] = assetClassesJson as AssetClass[]
-export const profiles: Profile[] = profilesJson as Profile[]
-export const historicalReturns: HistoricalPoint[] =
-  historicalReturnsJson as HistoricalPoint[]
+// JSON imports sao tipados literalmente pelo TS (strings em vez de literais).
+// Cast via `unknown` e a unica maneira segura de forcar os tipos corretos.
+export const assetClasses = assetClassesJson as unknown as AssetClass[]
+export const profiles = profilesJson as unknown as Profile[]
+export const historicalReturns = historicalReturnsJson as unknown as HistoricalPoint[]
 
 export function getProfile(id: string): Profile | undefined {
   return profiles.find((p) => p.id === id)
