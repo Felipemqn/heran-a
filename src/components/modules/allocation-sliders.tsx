@@ -18,6 +18,7 @@ import {
   type BucketId,
 } from '@/lib/returns/data'
 import { portfolioStats } from '@/lib/returns/statistics'
+import MonteCarloPanel from './monte-carlo-panel'
 
 interface Props {
   defaultProfileId: string
@@ -129,7 +130,15 @@ export default function AllocationSliders({ defaultProfileId }: Props) {
     .map((c: AssetClass) => ({ name: c.label, value: weights[c.id], id: c.id }))
     .filter((d: { value: number }) => d.value > 0.1)
 
+  const normalizedFractions = useMemo(() => {
+    const norm = normalizeTo100(weights)
+    return Object.fromEntries(
+      Object.entries(norm).map(([k, v]) => [k, v / 100])
+    ) as Record<BucketId, number>
+  }, [weights])
+
   return (
+    <div className="flex flex-col gap-8">
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 flex flex-col gap-6">
         <Panel
@@ -315,6 +324,13 @@ export default function AllocationSliders({ defaultProfileId }: Props) {
           </div>
         </Card>
       </div>
+    </div>
+
+      <MonteCarloPanel
+        weights={normalizedFractions}
+        initialBrl={initialBrl}
+        years={years}
+      />
     </div>
   )
 }
